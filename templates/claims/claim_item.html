@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Claim Item - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 700px; margin: 0 auto;">
+            <a href="{% url 'items:detail' item.id %}" style="color: #08598b; text-decoration: none; margin-bottom: 1rem; display: inline-block;">← Back to Item</a>
+            
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h1 style="color: #08598b; margin-bottom: 2rem;">Claim This Item</h1>
+                
+                <!-- Item Summary -->
+                <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 5px; margin-bottom: 2rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;">
+                        {% else %}
+                        <div style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #ecb80d; font-size: 2.5rem; border-radius: 5px;">
+                            {% if item.category == 'ID' %}🪪
+                            {% elif item.category == 'Gadget' %}📱
+                            {% elif item.category == 'Book' %}📚
+                            {% elif item.category == 'Clothing' %}👕
+                            {% elif item.category == 'Keys' %}🔑
+                            {% elif item.category == 'Wallet' %}👛
+                            {% else %}📦{% endif %}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h3 style="color: #08598b; margin-bottom: 0.5rem;">{{ item.category }}</h3>
+                            <p style="color: #666; margin-bottom: 0.3rem;">{{ item.description|truncatewords:15 }}</p>
+                            <p style="color: #999; font-size: 0.9rem;">📍 {{ item.location_text }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Verification Question -->
+                <div style="background: #fff3cd; border-left: 4px solid #ecb80d; padding: 1rem; margin-bottom: 2rem;">
+                    <h3 style="color: #08598b; font-size: 1rem; margin-bottom: 0.5rem;">⚠️ Verification Required</h3>
+                    <p style="color: #666;">To claim this item, please answer the following question set by the finder:</p>
+                    <p style="font-weight: 600; color: #08598b; margin-top: 1rem; font-size: 1.1rem;">"{{ item.verification_question }}"</p>
+                </div>
+                
+                <!-- Claim Form -->
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div style="background-color: #f44336; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.answer_text.id_for_label }}">Your Answer *</label>
+                        {{ form.answer_text }}
+                        {% if form.answer_text.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.answer_text.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">Be as specific as possible. The finder will review your answer.</small>
+                    </div>
+                    
+                    <div style="background: #e3f2fd; border-left: 4px solid #08598b; padding: 1rem; margin-bottom: 1.5rem;">
+                        <p style="color: #08598b; font-size: 0.9rem; margin: 0;">
+                            <strong>Note:</strong> Your claim will be reviewed by the finder. If approved, you'll receive a notification with instructions on how to collect the item.
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Claim</button>
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

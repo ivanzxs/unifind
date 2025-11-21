@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - UniFind{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height: 100vh; display: flex; align-items: center; padding: 2rem 0;">
+    <div class="container">
+        <div style="max-width: 1000px; margin: 0 auto; position: relative;">
+            </a>
+            <div style="background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; display: flex; min-height: 600px;">
+            
+            <!-- Left Side - Welcome -->
+            <div style="flex: 1; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); padding: 3rem; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; position: relative;">
+                <a href="{% url 'dashboard:landing' %}" aria-label="Home" style="position: absolute; top: 1.5rem; left: 1.5rem; color: #ecb80d; text-decoration: none; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-home"></i>
+                </a>
+                {% load static %}
+                <img src="{% static 'images/logo.png' %}" alt="UniFind Logo" style="height: 120px; width: auto; margin-bottom: 2rem;" onerror="this.style.display='none'">
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem; text-align: center; color: #ecb80d;">Welcome to UniFind</h1>
+                <p style="font-size: 1.1rem; text-align: center; opacity: 0.9; line-height: 1.6;">Your trusted campus lost and found system. Help reunite students with their belongings.</p>
+            </div>
+            
+            <!-- Right Side - Login Form -->
+            <div style="flex: 1; padding: 3rem; display: flex; flex-direction: column; justify-content: center;">
+                <h2 style="color: #08598b; margin-bottom: 0.5rem; font-size: 1.8rem;">Login to Your Account</h2>
+                <p style="color: #666; margin-bottom: 2rem;">Enter your credentials to continue</p>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div style="background-color: #f44336; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}">Email</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.username.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}">Password</label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.password.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.75rem; font-size: 1rem;">Login</button>
+                </form>
+
+                <p style="text-align: center; margin-top: 2rem; color: #666;">
+                    Don't have an account? <a href="{% url 'users:register' %}" style="color: #08598b; font-weight: 600; text-decoration: none;">Register here</a>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

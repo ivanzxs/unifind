@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}All Notifications - Admin - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 style="color: #08598b; margin-bottom: 2rem;">All Notifications</h1>
+
+        {% if notifications %}
+        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            {% for notif in notifications %}
+            <div style="border-bottom: 1px solid #ddd; padding: 1.5rem; {% if not notif.is_read %}background: #fff3cd; border-left: 4px solid #ecb80d;{% endif %}">
+                <div style="display: flex; gap: 1rem;">
+                    <!-- Item Image for match notifications -->
+                    {% if notif.item and notif.item.image %}
+                    <img src="{{ notif.item.image.url }}" alt="Item" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+                    {% else %}
+                    <div style="width: 50px; height: 50px; background: #17a2b8; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    {% endif %}
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <div>
+                                <h3 style="color: #08598b; margin: 0 0 0.25rem 0;">{{ notif.title }}</h3>
+                                <p style="color: #999; font-size: 0.85rem; margin: 0;">To: <strong>{{ notif.user.username }}</strong></p>
+                            </div>
+                            <span style="color: #999; font-size: 0.85rem;">{{ notif.created_at|timesince }} ago</span>
+                        </div>
+                        <p style="color: #666; margin: 0.5rem 0;">{{ notif.message }}</p>
+                        {% if notif.item %}
+                        <p style="color: #08598b; font-size: 0.9rem; margin-top: 0.5rem;">
+                            📦 Item: {{ notif.item.name|default:notif.item.description|truncatewords:10 }}
+                        </p>
+                        {% endif %}
+                        {% if notif.match %}
+                        <p style="color: #28a745; font-size: 0.9rem; margin-top: 0.5rem;">
+                            🔗 Match: {{ notif.match.match_percentage }}% similarity
+                        </p>
+                        {% endif %}
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <span class="card-badge" style="background-color: 
+                                {% if notif.type == 'item_approved' %}#28a745
+                                {% elif notif.type == 'item_rejected' %}#dc3545
+                                {% elif notif.type == 'match_found' %}#17a2b8
+                                {% else %}#6c757d{% endif %}; color: white;">
+                                {{ notif.get_type_display }}
+                            </span>
+                            {% if not notif.is_read %}
+                            <span class="card-badge" style="background-color: #ffc107; color: #333;">Unread</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 4rem; background: white; border-radius: 8px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔔</div>
+            <h3 style="color: #08598b;">No notifications yet</h3>
+            <p style="color: #666;">User notifications will appear here</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Items - Admin - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 style="color: #08598b; margin-bottom: 2rem;">Browse All Items</h1>
+
+        <!-- Filters -->
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+            <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: #666;">Status:</label>
+                    <select name="status" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="claimed">Claimed</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: #666;">Type:</label>
+                    <select name="type" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">All</option>
+                        <option value="lost">Lost</option>
+                        <option value="found">Found</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: #666;">Category:</label>
+                    <select name="category" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">All</option>
+                        <option value="ID">ID Card</option>
+                        <option value="Gadget">Gadget</option>
+                        <option value="Book">Book</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Keys">Keys</option>
+                        <option value="Wallet">Wallet</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; color: #666;">Search:</label>
+                    <input type="text" name="search" placeholder="Search..." style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="display: flex; align-items: end;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Items Grid -->
+        {% if items %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+            {% for item in items %}
+            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 100%; height: 200px; object-fit: contain; background-color: #f5f5f5;">
+                {% else %}
+                <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #ecb80d; font-size: 4rem;">
+                    📦
+                </div>
+                {% endif %}
+                
+                <div style="padding: 1.5rem;">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                        <span class="card-badge {% if item.type == 'lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.get_type_display }}
+                        </span>
+                        <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                        <span class="card-badge" style="background-color: 
+                            {% if item.status == 'pending' %}#ffc107
+                            {% elif item.status == 'approved' %}#28a745
+                            {% elif item.status == 'rejected' %}#dc3545
+                            {% else %}#6c757d{% endif %}; color: white;">
+                            {{ item.get_status_display }}
+                        </span>
+                        <span class="card-badge" style="background-color: 
+                            {% if item.severity == 'critical' %}#dc3545
+                            {% elif item.severity == 'high' %}#fd7e14
+                            {% elif item.severity == 'medium' %}#ffc107
+                            {% else %}#6c757d{% endif %}; color: white;">
+                            {{ item.get_severity_display }}
+                        </span>
+                    </div>
+                    <h3 style="color: #08598b; font-size: 1.1rem; margin-bottom: 0.5rem;">{{ item.name|default:item.description|truncatewords:5 }}</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">{{ item.description|truncatewords:12 }}</p>
+                    <p style="color: #999; font-size: 0.85rem;">
+                        📍 {{ item.location_text|truncatewords:5 }}<br>
+                        👤 {{ item.user.username }}<br>
+                        🕒 {{ item.created_at|timesince }} ago
+                    </p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-primary" style="flex: 1; text-align: center; min-width: 120px;">View Details</a>
+                        {% if user.is_authenticated and user != item.user %}
+                        <a href="{% url 'messaging:send_message' item.id %}" class="btn btn-secondary" style="flex: 1; text-align: center; min-width: 120px;">Message</a>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <button type="button" onclick="showDeleteModal({{ item.id }}, '{% url 'items:delete_item' item.id %}')" class="btn" style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; text-align: center; border: none; cursor: pointer;">Delete</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 4rem; background: white; border-radius: 8px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+            <h3 style="color: #08598b;">No items found</h3>
+            <p style="color: #666;">Try adjusting your filters</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

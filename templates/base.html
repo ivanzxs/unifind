@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UniFind - University Lost & Found{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            width: 250px;
+            background: #08598b;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            border-right: 3px solid #ecb80d;
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(236, 184, 13, 0.3);
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        .sidebar-logo img {
+            height: 35px;
+            width: auto;
+        }
+        .sidebar-logo span {
+            color: #ecb80d;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .sidebar-menu {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        .sidebar-menu::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1.5rem;
+            color: #ecb80d;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            position: relative;
+            margin: 0.2rem 0.5rem;
+            border-radius: 8px;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(236, 184, 13, 0.1);
+        }
+        .sidebar-menu a.active {
+            background: #ecb80d;
+            color: #08598b;
+            font-weight: 600;
+        }
+        .sidebar-menu a.active .icon {
+            color: #08598b;
+        }
+        .sidebar-menu a .icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+            color: #ecb80d;
+        }
+        .sidebar-menu a .badge {
+            position: absolute;
+            right: 1rem;
+            background: #dc3545;
+            color: white;
+            padding: 0.15rem 0.45rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(236, 184, 13, 0.3);
+        }
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            color: #ecb80d;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-radius: 8px;
+            margin: 0.2rem 0;
+        }
+        .sidebar-footer a:hover {
+            background: rgba(236, 184, 13, 0.1);
+        }
+        .sidebar-footer a.active {
+            background: #ecb80d;
+            color: #08598b;
+        }
+        .sidebar-footer a.active .icon {
+            color: #08598b;
+        }
+        .sidebar-footer a .icon {
+            color: #ecb80d;
+        }
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header" style="text-align: center; padding: 2rem 1rem;">
+            <a href="{% url 'dashboard:landing' %}" class="sidebar-logo" style="flex-direction: column; align-items: center; gap: 1rem;">
+                {% load static %}
+                <img src="{% static 'images/logo.png' %}" alt="UniFind Logo" style="height: 80px; width: auto;" onerror="this.style.display='none'">
+                <span style="font-size: 1.8rem; display: block; margin-top: 0.5rem;">UniFind</span>
+            </a>
+        </div>
+        
+        <nav class="sidebar-menu">
+            {% if user.is_staff %}
+                <!-- Admin Navigation -->
+                <a href="{% url 'dashboard:admin_home' %}" class="{% if request.resolver_match.url_name == 'admin_home' %}active{% endif %}">
+                    <i class="fas fa-home icon"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line icon"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'dashboard:admin_browse' %}" class="{% if request.resolver_match.url_name == 'admin_browse' %}active{% endif %}">
+                    <i class="fas fa-search icon"></i>
+                    <span>Browse Items</span>
+                </a>
+                <a href="{% url 'items:post_lost' %}" class="{% if request.resolver_match.url_name == 'post_lost' %}active{% endif %}">
+                    <i class="fas fa-exclamation-circle icon"></i>
+                    <span>Report Lost</span>
+                </a>
+                <a href="{% url 'items:post_found' %}" class="{% if request.resolver_match.url_name == 'post_found' %}active{% endif %}">
+                    <i class="fas fa-check-circle icon"></i>
+                    <span>Report Found</span>
+                </a>
+                <a href="{% url 'dashboard:admin_messages' %}" class="{% if 'messages' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-comments icon"></i>
+                    <span>Messages</span>
+                    {% if unread_messages_count > 0 %}
+                    <span class="badge">{{ unread_messages_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'dashboard:admin_notifications' %}" class="{% if 'notifications' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-bell icon"></i>
+                    <span>Notifications</span>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'dashboard:about_us' %}" class="{% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">
+                    <i class="fas fa-info-circle icon"></i>
+                    <span>About Us</span>
+                </a>
+            {% else %}
+                <!-- Regular User Navigation -->
+                <a href="{% url 'dashboard:landing' %}" class="{% if request.resolver_match.url_name == 'landing' %}active{% endif %}">
+                    <i class="fas fa-home icon"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'items:browse' %}" class="{% if request.resolver_match.url_name == 'browse' %}active{% endif %}">
+                    <i class="fas fa-search icon"></i>
+                    <span>Browse Items</span>
+                </a>
+                <a href="{% url 'items:post_lost' %}" class="{% if request.resolver_match.url_name == 'post_lost' %}active{% endif %}">
+                    <i class="fas fa-exclamation-circle icon"></i>
+                    <span>Report Lost</span>
+                </a>
+                <a href="{% url 'items:post_found' %}" class="{% if request.resolver_match.url_name == 'post_found' %}active{% endif %}">
+                    <i class="fas fa-check-circle icon"></i>
+                    <span>Report Found</span>
+                </a>
+                <a href="{% url 'messaging:inbox' %}" class="{% if 'inbox' in request.resolver_match.url_name or 'conversation' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-comments icon"></i>
+                    <span>Messages</span>
+                    {% if unread_messages_count > 0 %}
+                    <span class="badge">{{ unread_messages_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'dashboard:notifications' %}" class="{% if 'notifications' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-bell icon"></i>
+                    <span>Notifications</span>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'dashboard:about_us' %}" class="{% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">
+                    <i class="fas fa-info-circle icon"></i>
+                    <span>About Us</span>
+                </a>
+            {% endif %}
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{% url 'users:profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="fas fa-user icon"></i>
+                <span>Profile</span>
+            </a>
+            <a href="#" onclick="showLogoutModal(); return false;">
+                <i class="fas fa-sign-out-alt icon"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+    
+    <div class="main-content">
+    {% else %}
+    <!-- Guest - No Sidebar, No Navbar -->
+    <div style="width: 100%;">
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer" style="background: #f5f5f5; padding: 1.5rem 0; margin-top: auto;">
+        <div class="container">
+            <p style="text-align: center; color: #666; margin: 0;">&copy; 2025 UniFind. Making campus life easier.</p>
+        </div>
+    </footer>
+    
+    </div> <!-- Close main-content or guest div -->
+
+    <!-- Logout Modal -->
+    <div id="logoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <h3 style="color: #08598b; margin-bottom: 1rem; font-size: 1.3rem;">Are you sure you want to logout?</h3>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <a href="{% url 'users:logout' %}" class="btn btn-primary" style="flex: 1; text-align: center; background-color: #ecb80d; color: #08598b; padding: 0.75rem; text-decoration: none;">Yes</a>
+                <button onclick="hideLogoutModal()" class="btn btn-secondary" style="flex: 1; text-align: center; background-color: #6c757d; color: white; padding: 0.75rem; border: none; cursor: pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Item Modal -->
+    <div id="deleteItemModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <h3 style="color: #08598b; margin-bottom: 1rem; font-size: 1.3rem;">Are you sure you want to delete this item?</h3>
+            <form id="deleteItemForm" method="post" style="margin: 0;">
+                {% csrf_token %}
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1; text-align: center; background-color: #dc3545; color: white; padding: 0.75rem; border: none; cursor: pointer;">Yes</button>
+                    <button type="button" onclick="hideDeleteModal()" class="btn btn-secondary" style="flex: 1; text-align: center; background-color: #6c757d; color: white; padding: 0.75rem; border: none; cursor: pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+        
+        function hideLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+        
+        // Close logout modal when clicking outside
+        document.getElementById('logoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideLogoutModal();
+            }
+        });
+
+        function showDeleteModal(itemId, deleteUrl) {
+            document.getElementById('deleteItemForm').action = deleteUrl;
+            document.getElementById('deleteItemModal').style.display = 'flex';
+        }
+        
+        function hideDeleteModal() {
+            document.getElementById('deleteItemModal').style.display = 'none';
+        }
+        
+        // Close delete modal when clicking outside
+        document.getElementById('deleteItemModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideDeleteModal();
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="color: #08598b; margin: 0;">My Profile</h1>
+                <a href="{% url 'users:edit_profile' %}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Edit Profile</a>
+            </div>
+            
+            <!-- User Info & Details -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem;">
+                    <!-- Left Side: Profile Picture & Basic Info -->
+                    <div>
+                        <div style="display: flex; gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;">
+                            <!-- Profile Picture -->
+                            <div style="flex-shrink: 0;">
+                                {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #08598b;">
+                                {% else %}
+                                <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); display: flex; align-items: center; justify-content: center; color: #ecb80d; font-size: 3rem; border: 4px solid #08598b;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Name (horizontally next to picture) -->
+                            <div style="flex: 1; padding-top: 0.5rem;">
+                                <h2 style="color: #08598b; margin-bottom: 0.5rem; font-size: 1.8rem; font-weight: 600;">{{ user.get_full_name|default:user.username }}</h2>
+                            </div>
+                        </div>
+                        
+                        <!-- Username -->
+                        <div style="margin-bottom: 0.8rem;">
+                            <p style="color: #666; margin: 0; font-size: 1rem;">
+                                <i class="fas fa-at" style="color: #999; margin-right: 0.5rem;"></i>{{ user.username }}
+                            </p>
+                        </div>
+                        
+                        <!-- Student ID or Role -->
+                        <div style="margin-bottom: 0.8rem;">
+                            {% if user.role == 'student' and user.student_id %}
+                            <p style="color: #666; margin: 0; font-size: 1rem;">
+                                <i class="fas fa-id-card" style="color: #999; margin-right: 0.5rem;"></i>{{ user.student_id }}
+                            </p>
+                            {% else %}
+                            <p style="color: #666; margin: 0; font-size: 1rem;">
+                                <i class="fas fa-user-tag" style="color: #999; margin-right: 0.5rem;"></i>{{ user.get_role_display }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Reputation Points (for user) or Administrator Label (for admin) -->
+                        <div style="margin-bottom: 1rem;">
+                            {% if not user.is_staff %}
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); border-radius: 5px; color: white;">
+                                <i class="fas fa-star" style="color: #ecb80d; font-size: 0.9rem;"></i>
+                                <span style="font-size: 0.9rem; font-weight: 600;">{{ user.reputation_points }} Reputation Points</span>
+                            </div>
+                            {% else %}
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #ecb80d 0%, #d4a50c 100%); border-radius: 5px; color: #08598b;">
+                                <i class="fas fa-crown" style="font-size: 0.9rem;"></i>
+                                <span style="font-size: 0.9rem; font-weight: 600;">Administrator</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side: Additional Information -->
+                    <div>
+                        <h3 style="color: #08598b; margin-bottom: 1.5rem; font-size: 1.3rem; border-bottom: 2px solid #ecb80d; padding-bottom: 0.5rem;">Additional Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <!-- Email -->
+                            <div>
+                                <p style="color: #999; font-size: 0.85rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Email</p>
+                                <p style="color: #333; font-size: 1rem; margin: 0;">
+                                    <i class="fas fa-envelope" style="color: #08598b; margin-right: 0.5rem;"></i>{{ user.email }}
+                                </p>
+                            </div>
+                            
+                            <!-- Age -->
+                            {% if user.age %}
+                            <div>
+                                <p style="color: #999; font-size: 0.85rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Age</p>
+                                <p style="color: #333; font-size: 1rem; margin: 0;">
+                                    <i class="fas fa-birthday-cake" style="color: #08598b; margin-right: 0.5rem;"></i>{{ user.age }} years old
+                                </p>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Birthday -->
+                            {% if user.birthday %}
+                            <div>
+                                <p style="color: #999; font-size: 0.85rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Birthday</p>
+                                <p style="color: #333; font-size: 1rem; margin: 0;">
+                                    <i class="fas fa-calendar-alt" style="color: #08598b; margin-right: 0.5rem;"></i>{{ user.birthday|date:"F d, Y" }}
+                                </p>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Address -->
+                            {% if user.address %}
+                            <div style="grid-column: 1 / -1;">
+                                <p style="color: #999; font-size: 0.85rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Address</p>
+                                <p style="color: #333; font-size: 1rem; margin: 0; line-height: 1.6;">
+                                    <i class="fas fa-map-marker-alt" style="color: #08598b; margin-right: 0.5rem;"></i>{{ user.address }}
+                                </p>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Date Joined -->
+                            <div>
+                                <p style="color: #999; font-size: 0.85rem; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">Member Since</p>
+                                <p style="color: #333; font-size: 1rem; margin: 0;">
+                                    <i class="fas fa-calendar-check" style="color: #08598b; margin-right: 0.5rem;"></i>{{ user.date_joined|date:"F Y" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Posted Items -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h3 style="color: #08598b; margin-bottom: 1.5rem;">My Posted Items</h3>
+                
+                <!-- Tabs -->
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #ddd;">
+                    <button class="tab-btn active" onclick="showTab('lost')" style="flex: 1; padding: 1rem; background: #08598b; color: white; border: none; cursor: pointer; font-weight: 600; border-radius: 5px 5px 0 0;">Lost Items ({{ my_lost_items.count }})</button>
+                    <button class="tab-btn" onclick="showTab('found')" style="flex: 1; padding: 1rem; background: #f5f5f5; color: #666; border: none; cursor: pointer; font-weight: 600; border-radius: 5px 5px 0 0;">Found Items ({{ my_found_items.count }})</button>
+                </div>
+                
+                <!-- Lost Items Tab -->
+                <div id="lost-tab" class="tab-content">
+                    {% if my_lost_items %}
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        {% for item in my_lost_items %}
+                        <div style="display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 5px;">
+                            {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                            {% else %}
+                            <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: #08598b; color: #ecb80d; font-size: 2rem; border-radius: 5px;">📦</div>
+                            {% endif %}
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <span class="card-badge badge-lost">Lost</span>
+                                    <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                                    <span class="card-badge" style="background-color: {% if item.status == 'claimed' %}#28a745{% else %}#6c757d{% endif %}; color: white;">{{ item.get_status_display }}</span>
+                                </div>
+                                <h4 style="color: #08598b; margin-bottom: 0.3rem; font-size: 1.1rem;">{{ item.name|default:item.description|truncatewords:8 }}</h4>
+                                <p style="color: #666; margin-bottom: 0.3rem; font-size: 0.95rem;">{{ item.description|truncatewords:15 }}</p>
+                                <p style="color: #999; font-size: 0.9rem;">📍 {{ item.location_text }} • {{ item.created_at|timesince }} ago</p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <a href="{% url 'items:detail' item.id %}" class="btn" style="background-color: #6c757d; color: white; padding: 0.5rem 1rem; font-size: 0.9rem;">View</a>
+                                <button type="button" onclick="showDeleteModal({{ item.id }}, '{% url 'items:delete_item' item.id %}')" class="btn" style="background-color: #08598b; color: white; border: none; padding: 0.5rem 1rem; font-size: 0.9rem; cursor: pointer;">Delete</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 2rem; color: #999;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                        <p>You haven't reported any lost items yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Found Items Tab -->
+                <div id="found-tab" class="tab-content" style="display: none;">
+                    {% if my_found_items %}
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        {% for item in my_found_items %}
+                        <div style="display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 5px;">
+                            {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                            {% else %}
+                            <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: #ecb80d; color: #08598b; font-size: 2rem; border-radius: 5px;">✨</div>
+                            {% endif %}
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <span class="card-badge badge-found">Found</span>
+                                    <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                                    <span class="card-badge" style="background-color: {% if item.status == 'claimed' %}#28a745{% else %}#6c757d{% endif %}; color: white;">{{ item.get_status_display }}</span>
+                                </div>
+                                <h4 style="color: #08598b; margin-bottom: 0.3rem; font-size: 1.1rem;">{{ item.name|default:item.description|truncatewords:8 }}</h4>
+                                <p style="color: #666; margin-bottom: 0.3rem; font-size: 0.95rem;">{{ item.description|truncatewords:15 }}</p>
+                                <p style="color: #999; font-size: 0.9rem;">📍 {{ item.location_text }} • {{ item.created_at|timesince }} ago</p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <a href="{% url 'items:detail' item.id %}" class="btn" style="background-color: #6c757d; color: white; padding: 0.5rem 1rem; font-size: 0.9rem;">View</a>
+                                <button type="button" onclick="showDeleteModal({{ item.id }}, '{% url 'items:delete_item' item.id %}')" class="btn" style="background-color: #08598b; color: white; border: none; padding: 0.5rem 1rem; font-size: 0.9rem; cursor: pointer;">Delete</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 2rem; color: #999;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                        <p>You haven't reported any found items yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function showTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.style.background = '#f5f5f5';
+        btn.style.color = '#666';
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-tab').style.display = 'block';
+    
+    // Add active class to clicked button
+    event.target.style.background = '#08598b';
+    event.target.style.color = 'white';
+}
+</script>
+{% endblock %}

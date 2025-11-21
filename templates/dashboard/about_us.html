@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - UniFind{% endblock %}
+
+{% block content %}
+<section class="section" style="background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #fff; padding: 4rem 0; position: relative;">
+    {% if not user.is_authenticated %}
+    <div style="position: absolute; top: 1.5rem; left: 1.5rem;">
+        <a href="{% url 'dashboard:landing' %}" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: rgba(236, 184, 13, 0.2); color: #ecb80d; border-radius: 50%; text-decoration: none; font-size: 1.2rem; transition: all 0.3s;" onmouseover="this.style.background='rgba(236, 184, 13, 0.3)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(236, 184, 13, 0.2)'; this.style.transform='scale(1)'">
+            <i class="fas fa-home"></i>
+        </a>
+    </div>
+    {% endif %}
+    <div class="container">
+        <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+            <h1 style="font-size: 3.5rem; margin-bottom: 1rem; color: #ecb80d; font-weight: bold;">About Us</h1>
+            <div style="width: 100px; height: 4px; background: #ecb80d; margin: 0 auto 2rem;"></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" style="background: #fff; padding: 4rem 0;">
+    <div class="container">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); line-height: 1.8; color: #333;">
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem; text-align: justify;">
+                    UniFind is a student–centered web application designed to help learners easily locate and retrieve misplaced items within the school campus. Created by a team of BS Computer Science students, UniFind aims to provide a faster, more organized, and more reliable system for handling lost-and-found concerns, replacing the traditional manual process that often leads to delays, confusion, and unclaimed items.
+                </p>
+                
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem; text-align: justify;">
+                    Our mission is to make lost-and-found management simple, transparent, and accessible for all students and staff. By integrating modern web technologies, UniFind offers an efficient platform where users can report lost items, submit found objects, and check updates in real time.
+                </p>
+                
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem; text-align: justify; font-style: italic; color: #08598b;">
+                    We envision a campus where no item goes permanently missing—where technology bridges the gap between students and their belongings.
+                </p>
+                
+                <p style="font-size: 1.1rem; margin-bottom: 0; text-align: justify;">
+                    The UniFind team is committed to continuous improvement, ensuring that the system remains user-friendly, secure, and helpful to the entire school community.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" style="background: #f8f9fa; padding: 4rem 0;">
+    <div class="container">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <div style="background: white; border-radius: 12px; padding: 3rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem; align-items: start;">
+                    <!-- Left Side: Picture -->
+                    <div>
+                        <img src="{% static 'images/ivan.jpg' %}" alt="John Ivan Acuesta" style="width: 100%; max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover;">
+                    </div>
+                    
+                    <!-- Right Side: Information -->
+                    <div>
+                        <h2 style="color: #08598b; font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600;">John Ivan Acuesta</h2>
+                        <p style="color: #ecb80d; font-size: 1.2rem; margin-bottom: 1.5rem; font-weight: 500;">Web Developer</p>
+                        <h3 style="color: #08598b; font-size: 1.1rem; margin-bottom: 0.75rem; font-weight: 600;">Description</h3>
+                        <p style="color: #666; font-size: 1rem; line-height: 1.8; margin: 0; text-align: justify;">
+                            As the Web Developer of UniFind, I am responsible for building and maintaining the technical infrastructure of the platform. My role involves developing robust backend systems, implementing secure user authentication, and ensuring smooth functionality across all features. I work closely with the team to translate design concepts into functional web applications, focusing on performance, security, and user experience. Through my technical expertise, I help create a reliable and efficient system that connects students with their lost belongings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- UniFind Media Section -->
+<section class="section" style="background: #fff; padding: 4rem 0;">
+    <div class="container">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2 style="color: #08598b; font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 600;">UniFind Media</h2>
+                <p style="color: #666; font-size: 1.1rem;">Explore our brand identity and system features</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 900px; margin: 0 auto;">
+                <!-- Logo Card -->
+                <div class="unifind-media-card" onclick="openLogoModal()" style="background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 8px 25px rgba(8, 89, 139, 0.2)'; this.style.borderColor='#08598b'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'; this.style.borderColor='transparent'">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i class="fas fa-image" style="font-size: 2rem; color: #ecb80d;"></i>
+                    </div>
+                    <h3 style="color: #08598b; font-size: 1.3rem; margin: 0; font-weight: 600;">LOGO</h3>
+                </div>
+                
+                <!-- Poster Card -->
+                <div class="unifind-media-card" onclick="openPosterModal()" style="background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 8px 25px rgba(8, 89, 139, 0.2)'; this.style.borderColor='#08598b'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'; this.style.borderColor='transparent'">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i class="fas fa-file-image" style="font-size: 2rem; color: #ecb80d;"></i>
+                    </div>
+                    <h3 style="color: #08598b; font-size: 1.3rem; margin: 0; font-weight: 600;">POSTER</h3>
+                </div>
+                
+                <!-- Advertisement Video Card -->
+                <div class="unifind-media-card" onclick="openVideoModal()" style="background: white; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; cursor: pointer; transition: all 0.3s; border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 8px 25px rgba(8, 89, 139, 0.2)'; this.style.borderColor='#08598b'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'; this.style.borderColor='transparent'">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                        <i class="fas fa-video" style="font-size: 2rem; color: #ecb80d;"></i>
+                    </div>
+                    <h3 style="color: #08598b; font-size: 1.3rem; margin: 0; font-weight: 600;">SYSTEM DEMO</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Logo Modal -->
+<div id="logoModal" class="unifind-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; overflow-y: auto; padding: 2rem 0;">
+    <div style="background: white; max-width: 900px; margin: 2rem auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); position: relative;">
+        <span onclick="closeLogoModal()" style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2.5rem; color: #08598b; cursor: pointer; font-weight: bold; z-index: 10001; transition: all 0.3s;" onmouseover="this.style.color='#ecb80d'; this.style.transform='scale(1.2)'" onmouseout="this.style.color='#08598b'; this.style.transform='scale(1)'">&times;</span>
+        <div style="padding: 3rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <img id="logoImage" src="{% static 'images/logo.png' %}" alt="UniFind Logo" style="max-width: 100%; max-height: 400px; height: auto; object-fit: contain; border-radius: 8px;">
+            </div>
+            <div>
+                <h3 style="color: #08598b; font-size: 1.8rem; margin-bottom: 1rem; font-weight: 600;">UniFind Brand Identity</h3>
+                <p style="color: #666; font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; text-align: justify;">
+                    The UniFind logo represents our commitment to providing a reliable, efficient, and student-centered lost-and-found management system. Our brand identity reflects innovation, trust, and accessibility in campus services.
+                </p>
+                <p style="color: #333; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Design Elements & Meaning:</p>
+                <ul style="color: #666; font-size: 1rem; line-height: 1.8; margin-bottom: 1.5rem; padding-left: 1.5rem;">
+                    <li><strong style="color: #08598b;">Blue Color:</strong> Represents trust, reliability, and professionalism in our services</li>
+                    <li><strong style="color: #08598b;">Yellow Accent:</strong> Symbolizes energy, enthusiasm, and the warmth of helping students</li>
+                    <li><strong style="color: #08598b;">Typography:</strong> Modern and clean font that ensures readability across all platforms</li>
+                    <li><strong style="color: #08598b;">Icon Design:</strong> Represents connection, finding, and returning lost items</li>
+                </ul>
+                <p style="color: #333; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Brand Values:</p>
+                <p style="color: #666; font-size: 1rem; line-height: 1.8; margin: 0; text-align: justify;">
+                    Our logo embodies unity, discovery, and progress - core values that drive our mission to revolutionize campus lost-and-found management. It represents our dedication to connecting students with their belongings, ensuring no item goes permanently missing, and embracing technology to enhance the experience for everyone in the campus community.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Poster Modal -->
+<div id="posterModal" class="unifind-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; overflow-y: auto; padding: 2rem 0;">
+    <div style="background: white; max-width: 1000px; margin: 2rem auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); position: relative;">
+        <span onclick="closePosterModal()" style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2.5rem; color: #08598b; cursor: pointer; font-weight: bold; z-index: 10001; transition: all 0.3s;" onmouseover="this.style.color='#ecb80d'; this.style.transform='scale(1.2)'" onmouseout="this.style.color='#08598b'; this.style.transform='scale(1)'">&times;</span>
+        <div style="padding: 3rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+                <div style="text-align: center;">
+                    <img id="posterImage" src="{% static 'images/poster.jpg' %}" alt="UniFind Poster" style="max-width: 100%; max-height: 500px; height: auto; object-fit: contain; border-radius: 8px;">
+                </div>
+                <div>
+                    <h3 style="color: #08598b; font-size: 1.8rem; margin-bottom: 1rem; font-weight: 600;">UniFind System Poster</h3>
+                    <p style="color: #666; font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; text-align: justify;">
+                        Our comprehensive promotional poster showcases the revolutionary features and benefits of the UniFind lost-and-found management system. This visual representation highlights our commitment to modernizing campus services through technology.
+                    </p>
+                    <p style="color: #333; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Key Features Highlighted:</p>
+                    <ul style="color: #666; font-size: 1rem; line-height: 1.8; margin-bottom: 1.5rem; padding-left: 1.5rem;">
+                        <li>User-friendly web interface for seamless item reporting</li>
+                        <li>Real-time updates and notifications for users</li>
+                        <li>Secure verification system for item claims</li>
+                        <li>Priority-based categorization for urgent items</li>
+                        <li>Admin dashboard for efficient item management</li>
+                    </ul>
+                    <p style="color: #666; font-size: 1rem; line-height: 1.8; margin: 0; text-align: justify;">
+                        The poster demonstrates our vision of making lost-and-found management simple, accessible, and reliable for everyone in the campus community. It represents our dedication to bridging the gap between traditional manual processes and modern digital solutions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="unifind-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; overflow-y: auto; padding: 2rem 0;">
+    <div style="background: #000; max-width: 1200px; margin: 2rem auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); position: relative;">
+        <span onclick="closeVideoModal()" style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2.5rem; color: #fff; cursor: pointer; font-weight: bold; z-index: 10001; transition: all 0.3s;" onmouseover="this.style.color='#ecb80d'; this.style.transform='scale(1.2)'" onmouseout="this.style.color='#fff'; this.style.transform='scale(1)'">&times;</span>
+        <div style="padding: 2rem;">
+            <video id="adVideo" controls style="width: 100%; max-height: 70vh; border-radius: 8px; background: #000;">
+                <source src="{% static 'images/demo.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+</div>
+
+<script>
+function openLogoModal() {
+    document.getElementById('logoModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLogoModal() {
+    document.getElementById('logoModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function openPosterModal() {
+    document.getElementById('posterModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closePosterModal() {
+    document.getElementById('posterModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function openVideoModal() {
+    document.getElementById('videoModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal() {
+    document.getElementById('videoModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    // Pause video when closing
+    const video = document.getElementById('adVideo');
+    if (video) {
+        video.pause();
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const logoModal = document.getElementById('logoModal');
+    const posterModal = document.getElementById('posterModal');
+    const videoModal = document.getElementById('videoModal');
+    
+    if (event.target == logoModal) {
+        closeLogoModal();
+    }
+    if (event.target == posterModal) {
+        closePosterModal();
+    }
+    if (event.target == videoModal) {
+        closeVideoModal();
+    }
+}
+</script>
+
+<style>
+/* Team member images - prevent distortion and blur */
+.team-member-photo {
+    image-rendering: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-perspective: 1000;
+    perspective: 1000;
+}
+
+/* Hover effect for team cards */
+@media (hover: hover) {
+    .team-member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+    }
+}
+</style>
+{% endblock %}
+

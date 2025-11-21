@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Item - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <h1 style="color: #08598b; margin-bottom: 2rem;">Edit Item</h1>
+            
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div style="background-color: #f44336; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">Category *</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.category.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Item Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.name.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">e.g., Black Headphones, Blue Wallet, Math Textbook</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">Description *</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.description.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.image.id_for_label }}">Upload Photo</label>
+                        {% if item.image %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <img src="{{ item.image.url }}" alt="Current image" style="max-width: 200px; border-radius: 5px;">
+                            <p style="color: #666; font-size: 0.9rem;">Current image (upload new to replace)</p>
+                        </div>
+                        {% endif %}
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.image.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.location_text.id_for_label }}">Location *</label>
+                        {{ form.location_text }}
+                        {% if form.location_text.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.location_text.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.claim_proof.id_for_label }}">{{ form.claim_proof.label }}</label>
+                        {% if item.claim_proof %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <img src="{{ item.claim_proof.url }}" alt="Current proof" style="max-width: 200px; border-radius: 5px;">
+                            <p style="color: #666; font-size: 0.9rem;">Current proof (upload new to replace)</p>
+                        </div>
+                        {% endif %}
+                        {{ form.claim_proof }}
+                        {% if form.claim_proof.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.claim_proof.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">{{ form.claim_proof.help_text }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.claimed_by_username.id_for_label }}">{{ form.claimed_by_username.label }}</label>
+                        {{ form.claimed_by_username }}
+                        {% if form.claimed_by_username.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.claimed_by_username.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">{{ form.claimed_by_username.help_text }}</small>
+                        {% if item.claimed_by_username %}
+                        <p style="color: #28a745; font-size: 0.9rem; margin-top: 0.5rem;">✓ Currently marked as returned/claimed by: <strong>{{ item.claimed_by_username }}</strong></p>
+                        {% endif %}
+                    </div>
+
+                    {{ form.location_lat }}
+                    {{ form.location_lng }}
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

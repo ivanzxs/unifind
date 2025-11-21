@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 1100px; width: 100%; margin: 0 auto;">
+            <a href="javascript:history.back()" aria-label="Go Back" style="color: #08598b; text-decoration: none; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 1.2rem;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            
+            <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.08);">
+                <h1 style="color: #08598b; margin-bottom: 0.5rem;">Edit Profile</h1>
+                <p style="color: #666; margin-bottom: 2rem;">Update only the fields you want to change</p>
+                
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div style="background-color: #f44336; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.profile_picture.id_for_label }}">Profile Picture</label>
+                        {% if user.profile_picture %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <img src="{{ user.profile_picture.url }}" alt="Current" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #08598b;">
+                            <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Current photo (upload new to replace)</p>
+                        </div>
+                        {% endif %}
+                        {{ form.profile_picture }}
+                        {% if form.profile_picture.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.profile_picture.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.first_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.last_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.email.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">
+                    
+                    <h3 style="color: #08598b; margin-bottom: 1rem; font-size: 1.2rem;">Change Password (Optional)</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Leave blank if you don't want to change your password</p>
+
+                    <div class="form-group">
+                        <label for="{{ form.current_password.id_for_label }}">Current Password</label>
+                        {{ form.current_password }}
+                        {% if form.current_password.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.current_password.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">{{ form.current_password.help_text }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.new_password.id_for_label }}">New Password</label>
+                        {{ form.new_password }}
+                        {% if form.new_password.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.new_password.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">{{ form.new_password.help_text }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.confirm_password.id_for_label }}">Confirm New Password</label>
+                        {{ form.confirm_password }}
+                        {% if form.confirm_password.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.confirm_password.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.75rem; font-size: 1rem;">Save Changes</button>
+                        <a href="{% url 'users:profile' %}" class="btn btn-secondary" style="flex: 1; text-align: center; padding: 0.75rem; font-size: 1rem;">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

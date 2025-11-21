@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="color: #08598b;">Notifications</h1>
+                {% if notifications %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">Mark All as Read</button>
+                </form>
+                {% endif %}
+            </div>
+            
+            {% if notifications %}
+            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+                {% for notification in notifications %}
+                <div style="padding: 1.5rem; border-bottom: 1px solid #f0f0f0; {% if not notification.is_read %}background: #fff3cd; border-left: 4px solid #ecb80d;{% endif %}">
+                    <div style="display: flex; gap: 1rem; align-items: start;">
+                        <!-- Item Image for match/approved -->
+                        {% if notification.item and notification.item.image and notification.type in 'item_approved,match_found' %}
+                        <img src="{{ notification.item.image.url }}" alt="Item" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+                        {% else %}
+                        <div style="width: 50px; height: 50px; background: {% if notification.type == 'item_approved' %}#28a745{% elif notification.type == 'item_rejected' %}#dc3545{% elif notification.type == 'match_found' %}#17a2b8{% else %}#08598b{% endif %}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                            <i class="fas {% if notification.type == 'item_approved' %}fa-check-circle{% elif notification.type == 'item_rejected' %}fa-times-circle{% elif notification.type == 'match_found' %}fa-link{% else %}fa-bell{% endif %}"></i>
+                        </div>
+                        {% endif %}
+                        <div style="flex: 1;">
+                            {% if notification.title %}
+                            <h3 style="color: #08598b; margin: 0 0 0.5rem 0; font-size: 1.1rem; {% if not notification.is_read %}font-weight: 700;{% endif %}">{{ notification.title }}</h3>
+                            {% endif %}
+                            <p style="color: #333; margin-bottom: 0.5rem; {% if not notification.is_read %}font-weight: 600;{% endif %}">{{ notification.message }}</p>
+                            <p style="color: #999; font-size: 0.9rem;">{{ notification.created_at|timesince }} ago</p>
+                            {% if notification.link_url %}
+                            <a href="{{ notification.link_url }}" class="btn btn-primary" style="margin-top: 0.5rem; padding: 0.4rem 1rem; font-size: 0.9rem;">View Item</a>
+                            {% endif %}
+                        </div>
+                        {% if not notification.is_read %}
+                        <div style="width: 10px; height: 10px; background: #ecb80d; border-radius: 50%; flex-shrink: 0; margin-top: 0.5rem;"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 3rem; text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🔕</div>
+                <h2 style="color: #08598b; margin-bottom: 1rem;">No Notifications</h2>
+                <p style="color: #666;">You're all caught up! Check back later for updates.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

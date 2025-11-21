@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - Admin - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <h1 style="color: #08598b; margin-bottom: 2rem;">Messages</h1>
+            
+            {% if conversations %}
+            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                {% for conv in conversations %}
+                <div style="display: flex; align-items: center; padding: 1.5rem; border-bottom: 1px solid #ddd;">
+                    <!-- User Profile Picture -->
+                    <a href="{% url 'users:public_profile' conv.user.id %}" style="flex-shrink: 0; margin-right: 1rem;" onclick="event.stopPropagation();">
+                        {% if conv.user.profile_picture %}
+                        <img src="{{ conv.user.profile_picture.url }}" alt="{{ conv.user.username }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #08598b; cursor: pointer;">
+                        {% else %}
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); display: flex; align-items: center; justify-content: center; color: #ecb80d; font-size: 1.5rem; border: 2px solid #08598b; cursor: pointer;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+                    
+                    <!-- Message Info (clickable to conversation) -->
+                    <div style="flex: 1;">
+                        <a href="{% url 'messaging:conversation' conv.user.id %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h3 style="color: #08598b; margin: 0; font-size: 1.1rem;">
+                                    {{ conv.user.get_full_name|default:conv.user.username }}
+                                </h3>
+                                <span style="color: #999; font-size: 0.85rem;">{{ conv.last_message.created_at|timesince }} ago</span>
+                            </div>
+                        </a>
+                        <a href="{% url 'messaging:conversation' conv.user.id %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+                            <p style="color: #666; margin: 0; font-size: 0.95rem;">
+                                {% if conv.last_message.sender == user %}
+                                <span style="color: #08598b;">You:</span>
+                                {% else %}
+                                <span style="color: #08598b;">{{ conv.user.get_full_name|default:conv.user.username }}:</span>
+                                {% endif %}
+                                {{ conv.last_message.content|truncatewords:10 }}
+                            </p>
+                            {% if conv.last_message.item %}
+                            <p style="color: #999; font-size: 0.85rem; margin-top: 0.3rem;">
+                                📦 About: {{ conv.last_message.item.name|default:conv.last_message.item.description|truncatewords:5 }}
+                            </p>
+                            {% endif %}
+                        </a>
+                    </div>
+                    
+                    <!-- Unread Badge -->
+                    {% if conv.unread_count > 0 %}
+                    <div style="flex-shrink: 0; margin-left: 1rem;">
+                        <span style="background: #dc3545; color: white; padding: 0.3rem 0.7rem; border-radius: 50%; font-size: 0.85rem; font-weight: bold;">
+                            {{ conv.unread_count }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 4rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">💬</div>
+                <h3 style="color: #08598b; margin-bottom: 1rem;">No Messages Yet</h3>
+                <p style="color: #666;">Messages between users will appear here</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - UniFind{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: #08598b;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.65rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #08598b;
+        box-shadow: 0 0 0 3px rgba(8, 89, 139, 0.1);
+    }
+    .form-group small {
+        display: block;
+        margin-top: 0.3rem;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height: 100vh; display: flex; align-items: center; padding: 2rem 0;">
+    <div class="container">
+        <div style="max-width: 1100px; margin: 0 auto; position: relative;">
+            
+            </a>
+            <div style="background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; display: flex; min-height: 650px;">
+            
+            <!-- Left Side - Welcome -->
+            <div style="flex: 1; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); padding: 3rem; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; position: relative;">
+                <a href="{% url 'dashboard:landing' %}" aria-label="Home" style="position: absolute; top: 1.5rem; left: 1.5rem; color: #ecb80d; text-decoration: none; font-size: 1.5rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-home"></i>
+                </a>
+                {% load static %}
+                <img src="{% static 'images/logo.png' %}" alt="UniFind Logo" style="height: 120px; width: auto; margin-bottom: 2rem;" onerror="this.style.display='none'">
+                <h1 style="font-size: 2.5rem; margin-bottom: 1rem; text-align: center; color: #ecb80d;">Welcome to UniFind</h1>
+                <p style="font-size: 1.1rem; text-align: center; opacity: 0.9; line-height: 1.6;">Join our community and help make campus life easier for everyone.</p>
+            </div>
+            
+            <!-- Right Side - Register Form -->
+            <div style="flex: 1.2; padding: 2.5rem; display: flex; flex-direction: column; overflow-y: auto; max-height: 650px;">
+                <h2 style="color: #08598b; margin-bottom: 0.5rem; font-size: 1.6rem;">Create Your Account</h2>
+                <p style="color: #666; margin-bottom: 1rem; font-size: 0.95rem;">Fill in your details to get started</p>
+            
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div style="background-color: #f44336; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+                
+                <div class="form-group">
+                    <label for="{{ form.profile_picture.id_for_label }}">Profile Picture</label>
+                    {{ form.profile_picture }}
+                    {% if form.profile_picture.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.profile_picture.errors.0 }}</span>
+                    {% endif %}
+                    <small style="color: #666;">Optional. Upload a clear photo (JPG/PNG).</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.username.errors.0 }}</span>
+                    {% endif %}
+                    {% if form.username.help_text %}
+                    <small style="color: #666;">{{ form.username.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.email.errors.0 }}</span>
+                    {% endif %}
+                    {% if form.email.help_text %}
+                    <small style="color: #666;">{{ form.email.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.role.id_for_label }}">Role</label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.role.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group" id="student_id_group" style="display: none;">
+                    <label for="{{ form.student_id.id_for_label }}">Student ID <span style="color: #f44336;">*</span></label>
+                    {{ form.student_id }}
+                    {% if form.student_id.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.student_id.errors.0 }}</span>
+                    {% endif %}
+                    {% if form.student_id.help_text %}
+                    <small style="color: #666;">{{ form.student_id.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="{{ form.age.id_for_label }}">Age</label>
+                        {{ form.age }}
+                        {% if form.age.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.age.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.birthday.id_for_label }}">Birthday</label>
+                        {{ form.birthday }}
+                        {% if form.birthday.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.birthday.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.address.id_for_label }}">Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.address.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.first_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.last_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}">Password</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.password1.errors.0 }}</span>
+                    {% endif %}
+                    {% if form.password1.help_text %}
+                    <small style="color: #666;">{{ form.password1.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                    <span style="color: #f44336; font-size: 0.9rem;">{{ form.password2.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.75rem; font-size: 1rem;">Register</button>
+            </form>
+
+            <p style="text-align: center; margin-top: 2rem; color: #666;">
+                Already have an account? <a href="{% url 'users:login' %}" style="color: #08598b; font-weight: 600; text-decoration: none;">Login here</a>
+            </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function toggleStudentId() {
+        const roleSelect = document.getElementById('id_role');
+        const studentIdGroup = document.getElementById('student_id_group');
+        const studentIdField = document.getElementById('id_student_id');
+        const studentIdLabel = studentIdGroup ? studentIdGroup.querySelector('label') : null;
+        
+        if (roleSelect && studentIdGroup && studentIdField) {
+            if (roleSelect.value === 'student') {
+                studentIdGroup.style.display = 'block';
+                studentIdField.required = true;
+                studentIdField.removeAttribute('disabled');
+                studentIdField.style.display = 'block';
+            } else {
+                studentIdGroup.style.display = 'none';
+                studentIdField.required = false;
+                studentIdField.value = '';
+                studentIdField.removeAttribute('disabled');
+            }
+        }
+    }
+    
+    // Check on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleStudentId();
+        
+        // Also listen for changes
+        const roleSelect = document.getElementById('id_role');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', toggleStudentId);
+        }
+    });
+</script>
+{% endblock %}

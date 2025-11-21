@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Items - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 style="color: #08598b; margin-bottom: 2rem;">Browse Items</h1>
+        
+        <!-- Filters -->
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+            <form method="get" id="filterForm" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: end;">
+                <div style="flex: 1; min-width: 200px; display: flex; gap: 0.5rem;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: #08598b; font-weight: 600;">Search</label>
+                        <input type="text" name="search" id="searchInput" placeholder="Search by name or description..." value="{{ request.GET.search }}" style="width: 100%; padding: 0.8rem; border: 2px solid #ddd; border-radius: 5px;">
+                    </div>
+                    <div style="display: flex; align-items: end;">
+                        <button type="submit" class="btn btn-primary" style="height: fit-content; padding: 0.8rem 1.5rem;">Search</button>
+                    </div>
+                </div>
+                
+                <div style="min-width: 150px;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #08598b; font-weight: 600;">Type</label>
+                    <select name="type" id="typeSelect" style="width: 100%; padding: 0.8rem; border: 2px solid #ddd; border-radius: 5px;">
+                        <option value="">All</option>
+                        <option value="lost" {% if request.GET.type == 'lost' %}selected{% endif %}>Lost</option>
+                        <option value="found" {% if request.GET.type == 'found' %}selected{% endif %}>Found</option>
+                    </select>
+                </div>
+                
+                <div style="min-width: 150px;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #08598b; font-weight: 600;">Category</label>
+                    <select name="category" id="categorySelect" style="width: 100%; padding: 0.8rem; border: 2px solid #ddd; border-radius: 5px;">
+                        <option value="">All Categories</option>
+                        <option value="ID" {% if request.GET.category == 'ID' %}selected{% endif %}>ID Card</option>
+                        <option value="Gadget" {% if request.GET.category == 'Gadget' %}selected{% endif %}>Gadget/Electronics</option>
+                        <option value="Book" {% if request.GET.category == 'Book' %}selected{% endif %}>Book/Notebook</option>
+                        <option value="Clothing" {% if request.GET.category == 'Clothing' %}selected{% endif %}>Clothing/Accessories</option>
+                        <option value="Keys" {% if request.GET.category == 'Keys' %}selected{% endif %}>Keys</option>
+                        <option value="Wallet" {% if request.GET.category == 'Wallet' %}selected{% endif %}>Wallet/Purse</option>
+                        <option value="Others" {% if request.GET.category == 'Others' %}selected{% endif %}>Others</option>
+                    </select>
+                </div>
+                
+                <a href="{% url 'items:browse' %}" class="btn btn-secondary">Clear</a>
+            </form>
+        </div>
+        
+        <script>
+            // Auto-submit form when type or category changes
+            document.addEventListener('DOMContentLoaded', function() {
+                const typeSelect = document.getElementById('typeSelect');
+                const categorySelect = document.getElementById('categorySelect');
+                const filterForm = document.getElementById('filterForm');
+                
+                if (typeSelect) {
+                    typeSelect.addEventListener('change', function() {
+                        filterForm.submit();
+                    });
+                }
+                
+                if (categorySelect) {
+                    categorySelect.addEventListener('change', function() {
+                        filterForm.submit();
+                    });
+                }
+            });
+        </script>
+        
+        <!-- Items Grid -->
+        {% if items %}
+        <div class="card-grid">
+            {% for item in items %}
+            <div class="card">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.category }}" class="card-image" style="width: 100%; height: 200px; object-fit: contain; background-color: #f5f5f5;">
+                {% else %}
+                <div class="card-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #ecb80d; font-size: 3rem;">
+                    {% if item.category == 'ID' %}🪪
+                    {% elif item.category == 'Gadget' %}📱
+                    {% elif item.category == 'Book' %}📚
+                    {% elif item.category == 'Clothing' %}👕
+                    {% elif item.category == 'Keys' %}🔑
+                    {% elif item.category == 'Wallet' %}👛
+                    {% else %}📦{% endif %}
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="card-badge {% if item.type == 'lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.get_type_display }}
+                        </span>
+                        <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                        <!-- Show priority level if approved but not claimed, otherwise show status -->
+                        {% if item.status == 'claimed' %}
+                        <span class="card-badge" style="background-color: #28a745; color: white;">
+                            Claimed
+                        </span>
+                        {% else %}
+                        <span class="card-badge" style="background-color: 
+                            {% if item.severity == 'critical' %}#dc3545
+                            {% elif item.severity == 'high' %}#fd7e14
+                            {% elif item.severity == 'medium' %}#ffc107
+                            {% else %}#6c757d{% endif %}; color: white;">
+                            {{ item.get_severity_display }} Priority
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h3 class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">{{ item.name|default:item.description|truncatewords:5 }}</h3>
+                    <p class="card-text" style="font-size: 0.95rem; color: #666;">{{ item.description|truncatewords:12 }}</p>
+                    <p style="color: #999; font-size: 0.9rem;">
+                        📍 {{ item.location_text|truncatewords:5 }} • 
+                        {{ item.created_at|timesince }} ago
+                    </p>
+                    {% if not item.is_anonymous %}
+                    <p style="color: #666; font-size: 0.85rem;">
+                        Posted by: <a href="{% url 'users:public_profile' item.user.id %}" style="color: #08598b; font-weight: 600; text-decoration: none;">{{ item.user.get_full_name|default:item.user.username }}</a>
+                    </p>
+                    {% else %}
+                    <p style="color: #666; font-size: 0.85rem;">Posted by: <strong>Anonymous</strong></p>
+                    {% endif %}
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-primary" style="flex: 1; text-align: center;">View Details</a>
+                        {% if user.is_authenticated and user != item.user %}
+                        <a href="{% url 'messaging:send_message' item.id %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Message</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+            <h2 style="color: #08598b; margin-bottom: 1rem;">No Items Found</h2>
+            <p style="color: #666;">Try adjusting your filters or check back later.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

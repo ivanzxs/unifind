@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Send Message - UniFind{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 700px; margin: 0 auto;">
+            <h1 style="color: #08598b; margin-bottom: 2rem;">Send Message</h1>
+            
+            <!-- Item Info -->
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h3 style="color: #08598b; margin-bottom: 1rem;">About this item:</h3>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                    {% else %}
+                    <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: #08598b; color: #ecb80d; font-size: 2rem; border-radius: 5px;">📦</div>
+                    {% endif %}
+                    <div>
+                        <h4 style="color: #08598b; margin: 0 0 0.3rem 0;">{{ item.name|default:item.description|truncatewords:8 }}</h4>
+                        <p style="color: #666; margin: 0; font-size: 0.9rem;">{{ item.description|truncatewords:15 }}</p>
+                        <p style="color: #999; margin: 0.3rem 0 0 0; font-size: 0.85rem;">Posted by: {{ item.user.get_full_name|default:item.user.username }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Message Form -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="content">Your Message</label>
+                        <textarea name="content" id="content" required placeholder="Type your message here..." style="width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem; min-height: 150px;"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Send Message</button>
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

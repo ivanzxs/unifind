@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - UniFind{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div style="max-width: 1100px; width: 100%; margin: 0 auto;">
+            <h1 style="color: #08598b; margin-bottom: 2rem;">{{ title }}</h1>
+            
+            <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); width: 100%;">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div style="background-color: #f44336; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">Category *</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.category.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Item Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.name.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">e.g., Black Headphones, Blue Wallet, Math Textbook</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">Description *</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.description.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">Provide as much detail as possible to help identify the item.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.image.id_for_label }}">Upload Photo</label>
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.image.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">Optional but highly recommended.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.location_text.id_for_label }}">Location *</label>
+                        {{ form.location_text }}
+                        {% if form.location_text.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.location_text.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">Where was the item {% if item_type == 'lost' %}last seen{% else %}found{% endif %}?</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pin Location on Map (Optional)</label>
+                        <div id="map" style="height: 300px; border-radius: 5px; border: 2px solid #ddd;"></div>
+                        <small style="color: #666;">Click on the map to pin the exact location.</small>
+                        {{ form.location_lat }}
+                        {{ form.location_lng }}
+                    </div>
+
+                    {% if item_type == 'found' %}
+                    <div class="form-group">
+                        <label for="{{ form.verification_question.id_for_label }}">Verification Question *</label>
+                        {{ form.verification_question }}
+                        {% if form.verification_question.errors %}
+                        <span style="color: #f44336; font-size: 0.9rem;">{{ form.verification_question.errors.0 }}</span>
+                        {% endif %}
+                        <small style="color: #666;">{{ form.verification_question.help_text }}</small>
+                    </div>
+                    {% else %}
+                    {{ form.verification_question }}
+                    {% endif %}
+
+                    <div class="form-group" style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        {{ form.is_anonymous }}
+                        <div>
+                            <label for="{{ form.is_anonymous.id_for_label }}" style="cursor: pointer; font-weight: 600; color: #08598b;">Post Anonymously</label>
+                            <small style="display: block; color: #666; margin-top: 0.25rem;">Your identity will be hidden from other users.</small>
+                        </div>
+                    </div>
+
+                    <div style="background: #e3f2fd; border: 1px solid #08598b; padding: 1rem; border-radius: 5px; margin-top: 1rem;">
+                        <strong>ℹ️ Priority Level:</strong> The system will automatically assign a priority level based on your category:
+                        <ul style="margin: 0.5rem 0 0 1.5rem; font-size: 0.9rem;">
+                            <li><strong>Critical:</strong> Gadget/Electronics, Keys</li>
+                            <li><strong>High:</strong> Wallet/Purse, ID Card</li>
+                            <li><strong>Medium:</strong> Book/Notebook, Clothing/Accessories</li>
+                            <li><strong>Low:</strong> Others</li>
+                        </ul>
+                    </div>
+                    
+                    {% if not user.is_staff %}
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 5px; margin-top: 1rem;">
+                        <strong>⚠️ Note:</strong> Your item will be reviewed by an admin before it appears publicly. You will be notified once it's approved.
+                    </div>
+                    {% endif %}
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Submit for Approval</button>
+                        <a href="{% url 'dashboard:landing' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Initialize map (default to a campus location - you can customize coordinates)
+    const map = L.map('map').setView([11.5583, 124.3972], 15); // Manila coordinates as example
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    let marker = null;
+    
+    // Handle map clicks
+    map.on('click', function(e) {
+        // Round to 6 decimal places to fit database constraints
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+        
+        // Remove existing marker
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        
+        // Add new marker
+        marker = L.marker([lat, lng]).addTo(map);
+        
+        // Update hidden form fields
+        document.getElementById('{{ form.location_lat.id_for_label }}').value = lat;
+        document.getElementById('{{ form.location_lng.id_for_label }}').value = lng;
+    });
+    
+    // Load existing coordinates if editing
+    const existingLat = document.getElementById('{{ form.location_lat.id_for_label }}').value;
+    const existingLng = document.getElementById('{{ form.location_lng.id_for_label }}').value;
+    
+    if (existingLat && existingLng) {
+        marker = L.marker([existingLat, existingLng]).addTo(map);
+        map.setView([existingLat, existingLng], 15);
+    }
+</script>
+{% endblock %}

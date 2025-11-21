@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard - Campus Lost & Found{% endblock %}
+
+{% block content %}
+<section class="hero" style="background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #fff; padding: 1.5rem 0; text-align: center;">
+    <div class="container">
+        <div class="search-bar" style="max-width: 600px; margin: 0 auto; display: flex; gap: 0.5rem;">
+            <form method="get" action="{% url 'dashboard:student_dashboard' %}" style="display: flex; gap: 0.5rem; width: 100%;">
+                <input type="text" name="search" placeholder="Search for lost or found items..." value="{{ search_query }}" style="flex: 1; padding: 0.8rem; border: 2px solid #ecb80d; border-radius: 5px; font-size: 1rem;">
+                <button type="submit" style="padding: 0.8rem 1.5rem; background-color: #ecb80d; color: #08598b; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: background-color 0.3s; text-align: center;">Search</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if search_query and search_results %}
+        <h2 style="color: #08598b; margin-bottom: 2rem;">Search Results for "{{ search_query }}"</h2>
+        <div class="card-grid">
+            {% for item in search_results %}
+            <div class="card">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.category }}" class="card-image" style="width: 100%; height: 200px; object-fit: contain; background-color: #f5f5f5;">
+                {% else %}
+                <div class="card-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #ecb80d; font-size: 3rem; height: 200px;">
+                    {% if item.category == 'ID' %}🪪
+                    {% elif item.category == 'Gadget' %}📱
+                    {% elif item.category == 'Book' %}📚
+                    {% elif item.category == 'Clothing' %}👕
+                    {% elif item.category == 'Keys' %}🔑
+                    {% elif item.category == 'Wallet' %}👛
+                    {% else %}📦{% endif %}
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div>
+                        <span class="card-badge {% if item.type == 'lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.get_type_display }}
+                        </span>
+                        <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                        <span class="card-badge" style="background-color: 
+                            {% if item.severity == 'critical' %}#dc3545
+                            {% elif item.severity == 'high' %}#fd7e14
+                            {% elif item.severity == 'medium' %}#ffc107
+                            {% else %}#6c757d{% endif %}; color: white;">
+                            {{ item.get_severity_display }} Priority
+                        </span>
+                    </div>
+                    <h3 class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">{{ item.name|default:item.description|truncatewords:5 }}</h3>
+                    <p class="card-text" style="font-size: 0.95rem; color: #666;">{{ item.description|truncatewords:12 }}</p>
+                    <p style="color: #999; font-size: 0.9rem;">
+                        📍 {{ item.location_text|truncatewords:5 }} • 
+                        {{ item.created_at|timesince }} ago
+                    </p>
+                    <a href="{% url 'items:detail' item.id %}" class="btn btn-primary" style="margin-top: 1rem; width: 100%; text-align: center;">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif search_query %}
+        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+            <h3 style="color: #08598b; margin-bottom: 1rem;">No Items Found</h3>
+            <p style="color: #666;">Try adjusting your search or check back later.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Claims to Review -->
+        {% if claims_to_review %}
+        <div style="background: #fff3cd; border-left: 4px solid #ecb80d; padding: 1.5rem; border-radius: 5px; margin-bottom: 2rem;">
+            <h2 style="color: #08598b; margin-bottom: 1rem;">⚠️ Claims Awaiting Your Review ({{ claims_to_review.count }})</h2>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for claim in claims_to_review %}
+                <div style="background: white; padding: 1rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: #08598b;">{{ claim.item.category }}</strong> - 
+                        <span style="color: #666;">Claimed by {{ claim.claimant.get_full_name|default:claim.claimant.username }}</span>
+                        <p style="color: #999; font-size: 0.9rem; margin-top: 0.3rem;">{{ claim.created_at|timesince }} ago</p>
+                    </div>
+                    <a href="{% url 'claims:review_claim' claim.id %}" class="btn btn-primary">Review</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Tabs -->
+        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="display: flex; border-bottom: 2px solid #f0f0f0;">
+                <button class="tab-btn active" onclick="showTab('lost')" style="flex: 1; padding: 1rem; background: #08598b; color: white; border: none; cursor: pointer; font-weight: 600;">My Lost Items ({{ my_lost_items.count }})</button>
+                <button class="tab-btn" onclick="showTab('found')" style="flex: 1; padding: 1rem; background: #f5f5f5; color: #666; border: none; cursor: pointer; font-weight: 600;">My Found Items ({{ my_found_items.count }})</button>
+                <button class="tab-btn" onclick="showTab('claims')" style="flex: 1; padding: 1rem; background: #f5f5f5; color: #666; border: none; cursor: pointer; font-weight: 600;">My Claims ({{ my_claims.count }})</button>
+            </div>
+            
+            <!-- Lost Items Tab -->
+            <div id="lost-tab" class="tab-content" style="padding: 2rem;">
+                {% if my_lost_items %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for item in my_lost_items %}
+                    <div style="display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 5px;">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                        {% else %}
+                        <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: #08598b; color: #ecb80d; font-size: 2rem; border-radius: 5px;">📦</div>
+                        {% endif %}
+                        <div style="flex: 1;">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <span class="card-badge badge-lost">Lost</span>
+                                <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                                <span class="card-badge" style="background-color: 
+                                    {% if item.severity == 'critical' %}#dc3545
+                                    {% elif item.severity == 'high' %}#fd7e14
+                                    {% elif item.severity == 'medium' %}#ffc107
+                                    {% else %}#6c757d{% endif %}; color: white;">
+                                    {{ item.get_severity_display }} Priority
+                                </span>
+                            </div>
+                            <p style="color: #333; margin-bottom: 0.3rem;">{{ item.description|truncatewords:20 }}</p>
+                            <p style="color: #999; font-size: 0.9rem;">📍 {{ item.location_text }} • {{ item.created_at|timesince }} ago</p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'items:detail' item.id %}" class="btn btn-secondary">View</a>
+                            <form method="post" action="{% url 'items:delete_item' item.id %}" onsubmit="return confirm('Delete this item?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn" style="background-color: #dc3545; color: white; border: none;">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 2rem; color: #999;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <p>You haven't reported any lost items yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Found Items Tab -->
+            <div id="found-tab" class="tab-content" style="padding: 2rem; display: none;">
+                {% if my_found_items %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for item in my_found_items %}
+                    <div style="display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 5px;">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.category }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                        {% else %}
+                        <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: #ecb80d; color: #08598b; font-size: 2rem; border-radius: 5px;">✨</div>
+                        {% endif %}
+                        <div style="flex: 1;">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <span class="card-badge badge-found">Found</span>
+                                <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                                <span class="card-badge" style="background-color: 
+                                    {% if item.severity == 'critical' %}#dc3545
+                                    {% elif item.severity == 'high' %}#fd7e14
+                                    {% elif item.severity == 'medium' %}#ffc107
+                                    {% else %}#6c757d{% endif %}; color: white;">
+                                    {{ item.get_severity_display }} Priority
+                                </span>
+                            </div>
+                            <p style="color: #333; margin-bottom: 0.3rem;">{{ item.description|truncatewords:20 }}</p>
+                            <p style="color: #999; font-size: 0.9rem;">📍 {{ item.location_text }} • {{ item.created_at|timesince }} ago</p>
+                            <p style="color: #666; font-size: 0.9rem;">Claims: {{ item.claims.count }}</p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'items:detail' item.id %}" class="btn btn-secondary">View</a>
+                            <form method="post" action="{% url 'items:delete_item' item.id %}" onsubmit="return confirm('Delete this item?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn" style="background-color: #dc3545; color: white; border: none;">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 2rem; color: #999;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <p>You haven't reported any found items yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Claims Tab -->
+            <div id="claims-tab" class="tab-content" style="padding: 2rem; display: none;">
+                {% if my_claims %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for claim in my_claims %}
+                    <div style="display: flex; gap: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <span class="card-badge" style="background-color: {% if claim.status == 'pending' %}#ffc107{% elif claim.status == 'approved' %}#28a745{% else %}#dc3545{% endif %}; color: white;">{{ claim.get_status_display }}</span>
+                                <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ claim.item.category }}</span>
+                            </div>
+                            <p style="color: #333; margin-bottom: 0.3rem;"><strong>Item:</strong> {{ claim.item.description|truncatewords:15 }}</p>
+                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.3rem;"><strong>Your Answer:</strong> {{ claim.answer_text|truncatewords:10 }}</p>
+                            <p style="color: #999; font-size: 0.9rem;">Claimed {{ claim.created_at|timesince }} ago</p>
+                        </div>
+                        <a href="{% url 'items:detail' claim.item.id %}" class="btn btn-secondary">View Item</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 2rem; color: #999;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                    <p>You haven't claimed any items yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function showTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.style.background = '#f5f5f5';
+        btn.style.color = '#666';
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-tab').style.display = 'block';
+    
+    // Add active class to clicked button
+    event.target.style.background = '#08598b';
+    event.target.style.color = 'white';
+}
+</script>
+{% endblock %}

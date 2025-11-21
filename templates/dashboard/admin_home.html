@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Admin - UniFind{% endblock %}
+
+{% block content %}
+<section class="hero" style="background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #fff; padding: 1.5rem 0; text-align: center;">
+    <div class="container">
+        <div class="search-bar" style="max-width: 600px; margin: 0 auto; display: flex; gap: 0.5rem;">
+            <form method="get" action="{% url 'dashboard:admin_home' %}" style="display: flex; gap: 0.5rem; width: 100%;">
+                <input type="text" name="search" placeholder="Search for lost or found items..." value="{{ search_query }}" style="flex: 1; padding: 0.8rem; border: 2px solid #ecb80d; border-radius: 5px; font-size: 1rem;">
+                <button type="submit" style="padding: 0.8rem 1.5rem; background-color: #ecb80d; color: #08598b; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: background-color 0.3s; text-align: center;">Search</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if search_query and search_results %}
+        <h2 style="color: #08598b; margin-bottom: 2rem;">Search Results for "{{ search_query }}"</h2>
+        <div class="card-grid">
+            {% for item in search_results %}
+            <div class="card">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.category }}" class="card-image" style="width: 100%; height: 200px; object-fit: contain; background-color: #f5f5f5;">
+                {% else %}
+                <div class="card-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #ecb80d; font-size: 3rem; height: 200px;">
+                    {% if item.category == 'ID' %}🪪
+                    {% elif item.category == 'Gadget' %}📱
+                    {% elif item.category == 'Book' %}📚
+                    {% elif item.category == 'Clothing' %}👕
+                    {% elif item.category == 'Keys' %}🔑
+                    {% elif item.category == 'Wallet' %}👛
+                    {% else %}📦{% endif %}
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div>
+                        <span class="card-badge {% if item.type == 'lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.get_type_display }}
+                        </span>
+                        <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                        <span class="card-badge" style="background-color: 
+                            {% if item.severity == 'critical' %}#dc3545
+                            {% elif item.severity == 'high' %}#fd7e14
+                            {% elif item.severity == 'medium' %}#ffc107
+                            {% else %}#6c757d{% endif %}; color: white;">
+                            {{ item.get_severity_display }} Priority
+                        </span>
+                    </div>
+                    <h3 class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">{{ item.name|default:item.description|truncatewords:5 }}</h3>
+                    <p class="card-text" style="font-size: 0.95rem; color: #666;">{{ item.description|truncatewords:12 }}</p>
+                    <p style="color: #999; font-size: 0.9rem;">
+                        📍 {{ item.location_text|truncatewords:5 }} • 
+                        {{ item.created_at|timesince }} ago
+                    </p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-primary" style="flex: 1; text-align: center; min-width: 120px;">View Details</a>
+                        {% if user.is_authenticated and user != item.user %}
+                        <a href="{% url 'messaging:send_message' item.id %}" class="btn btn-secondary" style="flex: 1; text-align: center; min-width: 120px;">Message</a>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <button type="button" onclick="showDeleteModal({{ item.id }}, '{% url 'items:delete_item' item.id %}')" class="btn" style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; text-align: center; border: none; cursor: pointer;">Delete</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif search_query %}
+        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+            <h3 style="color: #08598b; margin-bottom: 1rem;">No Items Found</h3>
+            <p style="color: #666;">Try adjusting your search or check back later.</p>
+        </div>
+        {% else %}
+        <h2 class="text-center" style="color: #08598b; margin-bottom: 2rem;">Recent Items</h2>
+        {% if recent_items %}
+        <div class="card-grid">
+            {% for item in recent_items %}
+            <div class="card">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.category }}" class="card-image" style="width: 100%; height: 200px; object-fit: contain; background-color: #f5f5f5;">
+                {% else %}
+                <div class="card-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); color: #ecb80d; font-size: 3rem; height: 200px;">
+                    {% if item.category == 'ID' %}🪪
+                    {% elif item.category == 'Gadget' %}📱
+                    {% elif item.category == 'Book' %}📚
+                    {% elif item.category == 'Clothing' %}👕
+                    {% elif item.category == 'Keys' %}🔑
+                    {% elif item.category == 'Wallet' %}👛
+                    {% else %}📦{% endif %}
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div>
+                        <span class="card-badge {% if item.type == 'lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.get_type_display }}
+                        </span>
+                        <span class="card-badge" style="background-color: #f0f0f0; color: #666;">{{ item.category }}</span>
+                        <span class="card-badge" style="background-color: 
+                            {% if item.severity == 'critical' %}#dc3545
+                            {% elif item.severity == 'high' %}#fd7e14
+                            {% elif item.severity == 'medium' %}#ffc107
+                            {% else %}#6c757d{% endif %}; color: white;">
+                            {{ item.get_severity_display }} Priority
+                        </span>
+                    </div>
+                    <h3 class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">{{ item.name|default:item.description|truncatewords:5 }}</h3>
+                    <p class="card-text" style="font-size: 0.95rem; color: #666;">{{ item.description|truncatewords:12 }}</p>
+                    <p style="color: #999; font-size: 0.9rem;">
+                        📍 {{ item.location_text|truncatewords:5 }} • 
+                        {{ item.created_at|timesince }} ago
+                    </p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <a href="{% url 'items:detail' item.id %}" class="btn btn-primary" style="flex: 1; text-align: center; min-width: 120px;">View Details</a>
+                        {% if user.is_authenticated and user != item.user %}
+                        <a href="{% url 'messaging:send_message' item.id %}" class="btn btn-secondary" style="flex: 1; text-align: center; min-width: 120px;">Message</a>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <button type="button" onclick="showDeleteModal({{ item.id }}, '{% url 'items:delete_item' item.id %}')" class="btn" style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; text-align: center; border: none; cursor: pointer;">Delete</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+            <h3 style="color: #08598b; margin-bottom: 1rem;">No Items Yet</h3>
+            <p style="color: #666;">Be the first to report a lost or found item!</p>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</section>
+
+<section class="section" style="background-color: #fff;">
+    <div class="container text-center">
+        <h2 style="color: #08598b; margin-bottom: 2rem;">How It Works</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+            <div>
+                <div style="width: 80px; height: 80px; background-color: #08598b; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-edit" style="font-size: 2rem; color: #ecb80d;"></i>
+                </div>
+                <h3 style="color: #08598b;">Report</h3>
+                <p>Post a lost or found item with details and photos.</p>
+            </div>
+            <div>
+                <div style="width: 80px; height: 80px; background-color: #08598b; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-search" style="font-size: 2rem; color: #ecb80d;"></i>
+                </div>
+                <h3 style="color: #08598b;">Browse</h3>
+                <p>Search and browse items posted by other students.</p>
+            </div>
+            <div>
+                <div style="width: 80px; height: 80px; background-color: #08598b; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-check-circle" style="font-size: 2rem; color: #ecb80d;"></i>
+                </div>
+                <h3 style="color: #08598b;">Verify & Claim</h3>
+                <p>Answer verification questions to claim your item.</p>
+            </div>
+            <div>
+                <div style="width: 80px; height: 80px; background-color: #08598b; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-trophy" style="font-size: 2rem; color: #ecb80d;"></i>
+                </div>
+                <h3 style="color: #08598b;">Earn Points</h3>
+                <p>Build reputation by returning items to owners.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
