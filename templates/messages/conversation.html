@@ -1,14 +1,56 @@
 {% extends 'base.html' %}
 
+{% block extra_css %}
+<style>
+@media (max-width: 768px) {
+    .section {
+        padding: 1rem 0;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    /* Mobile message adjustments */
+    .message-container {
+        padding: 0.5rem !important;
+    }
+    
+    .message-bubble {
+        max-width: 90% !important;
+        padding: 0.5rem !important;
+        font-size: 0.9rem;
+    }
+    
+    .user-header {
+        padding: 0.75rem !important;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .message-form {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .message-input {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block title %}Conversation with {{ other_user.username }} - UniFind{% endblock %}
 
 {% block content %}
 <section class="section">
     <div class="container">
-        <div style="max-width: 900px; margin: 0 auto;">
+        <div style="max-width: 900px; margin: 0 auto; padding: 0 1rem;">
             
             <!-- User Header -->
-            <div style="background: white; padding: 1.5rem; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center;">
+            <div style="background: white; padding: 1rem; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center;">
                 {% if not other_user %}
                     <!-- No Admin Available -->
                     <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #08598b 0%, #0a6fa8 100%); display: flex; align-items: center; justify-content: center; color: #ecb80d; font-size: 1.5rem; border: 2px solid #08598b; margin-right: 1rem;">
@@ -44,11 +86,11 @@
             </div>
             
             <!-- Messages Container -->
-            <div style="background: #f5f5f5; padding: 2rem; min-height: 400px; max-height: 500px; overflow-y: auto; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">
+            <div style="background: #f5f5f5; padding: 1rem; min-height: 400px; max-height: 500px; overflow-y: auto; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">
                 {% for message in messages %}
                     <!-- Message Bubble -->
                     <div style="margin-bottom: 1rem; display: flex; {% if message.sender == user %}justify-content: flex-end;{% else %}justify-content: flex-start;{% endif %}">
-                        <div style="max-width: 70%; {% if message.sender == user %}background: #08598b; color: white;{% else %}background: white; color: #333;{% endif %} padding: 1rem; border-radius: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="max-width: 85%; {% if message.sender == user %}background: #08598b; color: white;{% else %}background: white; color: #333;{% endif %} padding: 0.75rem; border-radius: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             {% if message.item %}
                             <!-- Item Preview (messenger reply style) -->
                             <a href="{% url 'items:detail' message.item.id %}" style="display: block; margin-bottom: 0.75rem; text-decoration: none; {% if message.sender == user %}color: white;{% else %}color: inherit;{% endif %}">
@@ -98,13 +140,13 @@
             
             <!-- Message Input -->
             {% if other_user %}
-            <div style="background: white; padding: 1.5rem; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="background: white; padding: 1rem; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 <!-- Image Preview Container -->
                 <div id="imagePreviewContainer" style="display: none; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
                     <!-- Images will be dynamically added here -->
                 </div>
                 
-                <form method="post" enctype="multipart/form-data" id="messageForm" style="display: flex; gap: 1rem; align-items: flex-end;">
+                <form method="post" enctype="multipart/form-data" id="messageForm" style="display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap;">
                     {% csrf_token %}
                     <textarea name="content" id="messageContent" placeholder="Type your message..." style="flex: 1; padding: 0.8rem; border: 1px solid #ddd; border-radius: 20px; resize: none; font-family: inherit; font-size: 1rem;" rows="2"></textarea>
                     <label for="messageImage" style="display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 50%; cursor: pointer; transition: all 0.3s; margin-right: 0.5rem;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f5f5f5'">
