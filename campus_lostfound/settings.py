@@ -135,8 +135,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media uploads
+print(f"CLOUDINARY_URL exists: {bool(os.environ.get('CLOUDINARY_URL'))}")
+print(f"CLOUDINARY_CLOUD_NAME: {os.environ.get('CLOUDINARY_CLOUD_NAME')}")
+
 if os.environ.get('CLOUDINARY_URL'):
     # Production - use Cloudinary
+    print("Using Cloudinary for media storage")
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
         'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
@@ -146,6 +150,7 @@ if os.environ.get('CLOUDINARY_URL'):
     MEDIA_URL = '/media/'
 else:
     # Development - use local storage
+    print("Using local storage for media")
     MEDIA_URL = 'media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
