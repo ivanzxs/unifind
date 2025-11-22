@@ -134,9 +134,8 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media uploads - Force Cloudinary in production
-if not DEBUG:  # Production mode
-    # Force Cloudinary for production
+# Media uploads
+if not DEBUG:  # Production - use Cloudinary
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
         'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
@@ -144,9 +143,8 @@ if not DEBUG:  # Production mode
     }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'
-else:
-    # Development - use local storage
-    MEDIA_URL = 'media/'
+else:  # Development - use local storage
+    MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
